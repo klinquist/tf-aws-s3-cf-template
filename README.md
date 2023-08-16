@@ -7,6 +7,7 @@ This is a Terraform module that does the following:
 * Creates a CloudFront distribution
 * Creates an SSL certificate for the domain name (adding www. as a subject alternative name)
 * Creates a Route53 record for the domain name (adding www. as a CNAME)
+* Creates an IAM user & policy for a github action.  Warning: Check the permissions, they are too liberal right now :).
 
 This also assumes you want to receive email there and use a Google Workspace account for that - so the variables file includes the TXT record that you must add for Google verification.  If you don't, you can remove the MX record from the Route53 zone.
 
