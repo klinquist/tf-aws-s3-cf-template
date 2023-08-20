@@ -3,7 +3,8 @@
 Regularly register a domain and want to put some web content there?
 
 This is a Terraform module that does the following:
-* Creates an S3 bucket
+* Creates an S3 bucket (domainname)
+* Creates a second S3 bucket for logs (domainname-logs)
 * Creates a CloudFront distribution
 * Creates an SSL certificate for the domain name (adding www. as a subject alternative name)
 * Creates a Route53 record for the domain name (adding www. as a CNAME)

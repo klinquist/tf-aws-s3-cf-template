@@ -1,6 +1,16 @@
+resource "aws_s3_bucket" "log_bucket" {
+  bucket = "${var.domainName}-logs"
+}
+
+
 resource "aws_s3_bucket" "my_site_bucket" {
   bucket = var.domainName
+  logging {
+    target_bucket = "${aws_s3_bucket.log_bucket.id}"
+    target_prefix = "logs/"
+  }
 }
+
 
 resource "aws_s3_bucket_ownership_controls" "my_site_bucket" {
   bucket = aws_s3_bucket.my_site_bucket.id
@@ -63,4 +73,10 @@ resource "aws_s3_bucket_acl" "my_site_bucket" {
 
   bucket = aws_s3_bucket.my_site_bucket.id
   acl    = "public-read"
+}
+
+
+resource "aws_s3_bucket_acl" "my_logging_bucket" {
+  bucket = aws_s3_bucket.log_bucket.id
+  acl    = "log-delivery-write"
 }
