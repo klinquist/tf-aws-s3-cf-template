@@ -13,6 +13,16 @@ resource "aws_s3_bucket_logging" "my_logging_bucket" {
   target_prefix = "logs/"
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "l1" {
+  bucket = aws_s3_bucket.my_site_bucket.id
+  rule {
+    status = "Enabled"
+    id     = "expire_all_files"
+    expiration {
+        days = 15
+    }
+  }
+}
 
 resource "aws_s3_bucket_ownership_controls" "my_site_bucket" {
   bucket = aws_s3_bucket.my_site_bucket.id
