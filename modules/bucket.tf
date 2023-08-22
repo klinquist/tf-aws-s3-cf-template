@@ -1,16 +1,6 @@
-resource "aws_s3_bucket" "log_bucket" {
-  bucket = "${var.domainName}-logs"
-}
-
 
 resource "aws_s3_bucket" "my_site_bucket" {
   bucket = var.domainName
-}
-
-resource "aws_s3_bucket_logging" "my_logging_bucket" {
-  bucket = aws_s3_bucket.my_site_bucket.id
-  target_bucket = aws_s3_bucket.log_bucket.id
-  target_prefix = "logs/"
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "l1" {
