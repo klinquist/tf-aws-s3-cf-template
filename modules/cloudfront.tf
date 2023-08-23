@@ -1,6 +1,7 @@
 resource "aws_cloudfront_distribution" "my_cloudfront" {
   depends_on = [
-    aws_s3_bucket.my_site_bucket
+    aws_s3_bucket.my_site_bucket,
+    aws_s3_bucket.log_bucket
   ]
 
   origin {
@@ -15,6 +16,14 @@ resource "aws_cloudfront_distribution" "my_cloudfront" {
       origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
     }
   }
+
+
+  logging_config {
+    include_cookies = false
+    bucket          = aws_s3_bucket.log_bucket.bucket_domain_name
+    prefix          = ""
+  }
+
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
