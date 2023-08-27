@@ -5,6 +5,6 @@ SECRET=$(terraform state pull | jq '.resources[] | select(.type == "aws_iam_acce
 
 echo "Create the following action variables in your git repo:"
 echo "AWS_S3_BUCKET_NAME=$BUCKET"   
-echo "AWS_CLOUDFRONT_ID=$CLOUDFRONT_ID"
+echo "AWS_CLOUDFRONT_DISTRIBUTION_ID=$CLOUDFRONT_ID"
 echo "AWS_ACCESS_KEY_ID=$ACCESS_KEY"
 echo "AWS_SECRET_ACCESS_KEY=$SECRET"
