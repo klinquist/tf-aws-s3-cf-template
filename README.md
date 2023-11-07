@@ -16,23 +16,15 @@ This also assumes you want to receive email there and use a Google Workspace acc
 
 ### Prerequisites
 
-Before the deployment of this terraform module, make sure your hosted zone exists in Route 53 and move your domain to Route53 by changing NS records on your DNS provider.
+Before the deployment of this terraform module, make sure your hosted zone exists in Route 53 and move your domain to Route53 by changing NS records on your domain registrar.
 
 
 ### Installation
 
-Change these variables in the **terraform.tfvars** file.
+* Change the variables in the **terraform.tfvars** file.
+* Make sure you have AWS credentials in your environment and terraform installed
 
-```
-
-SiteTags = "Example" (Tag value of the resources.)
-
-domainName = "example.com" (This domain name should exists in the Route53. This module point this domain to CloudFront distribution and it will create SSL certificate for this domain name.)
-
-```
-
-You can now run this module when you change the variables.
-
+Run the following:
 ```
 terraform init
 terraform plan
