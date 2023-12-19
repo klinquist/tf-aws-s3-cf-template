@@ -16,7 +16,7 @@ This also assumes you want to receive email there and use a Google Workspace acc
 
 ### Prerequisites
 
-Before the deployment of this terraform module, make sure your hosted zone exists in Route 53 and move your domain to Route53 by changing NS records on your domain registrar.
+Before the deployment of this terraform module, make sure your hosted zone exists in Route 53 and move your domain to Route53 by changing NS records on your domain registrar. **If your domain's NS records are not yet pointed to AWS, this script will timeout validating the certificate.**
 
 
 ### Installation
