@@ -89,10 +89,10 @@ case $answer in
         
         
         # Add secrets to repo
-        gh secret set AWS_S3_BUCKET_NAME -b $BUCKET -R $repo_name
-        gh secret set AWS_CLOUDFRONT_DISTRIBUTION_ID -b $CLOUDFRONT_ID -R $repo_name
-        gh secret set AWS_ACCESS_KEY_ID -b $ACCESS_KEY -R $repo_name
-        gh secret set AWS_SECRET_ACCESS_KEY -b $SECRET -R $repo_name
+        gh secret set AWS_S3_BUCKET_NAME -b $BUCKET -R $repo_name -a actions
+        gh secret set AWS_CLOUDFRONT_DISTRIBUTION_ID -b $CLOUDFRONT_ID -R $repo_name -a actions
+        gh secret set AWS_ACCESS_KEY_ID -b $ACCESS_KEY -R $repo_name -a actions
+        gh secret set AWS_SECRET_ACCESS_KEY -b $SECRET -R $repo_name -a actions
 
         echo "done!"
         exit 0
