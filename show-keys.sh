@@ -1,4 +1,4 @@
-BUCKET=$(terraform state pull | jq '.resources[] | select(.type == "aws_s3_bucket") | .instances[0].attributes.id')
+BUCKET=$(terraform state pull | jq '.resources[] | select((.type == "aws_s3_bucket") and (.name == "my_site_bucket")) | .instances[0].attributes.id')
 CLOUDFRONT_ID=$(terraform state pull | jq '.resources[] | select(.type == "aws_cloudfront_distribution") | .instances[0].attributes.id')
 ACCESS_KEY=$(terraform state pull | jq '.resources[] | select(.type == "aws_iam_access_key") | .instances[0].attributes.id')
 SECRET=$(terraform state pull | jq '.resources[] | select(.type == "aws_iam_access_key") | .instances[0].attributes.secret')
