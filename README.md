@@ -37,4 +37,4 @@ terrafom apply --auto-approve
 
 Upload a webpage to your s3 bucket.
 
-I personally use Jekyll to create a static website from markdown, and a github action to deploy it to the bucket.  Run `./show-keys.sh` to show the appropriate keys to export to your github action.
+I personally use Jekyll to create a static website from markdown, and a github action to deploy it to the bucket.  Run `./add-secrets-to-repo.sh` to show the appropriate keys and optionally add them directly to the repo using the "gh" cli.
