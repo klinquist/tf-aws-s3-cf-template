@@ -30,16 +30,19 @@ A shell script that:
 ### Prerequisites
 
 
-1. [Install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
-2. [Install AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
-3. Generate an access key for your AWS account and add it to your environment.  You can do this in the AWS console under IAM -> Users -> Security Credentials -> Create Access Key.    Now, type `aws configure` and enter the access key and secret key.  You can leave the default region and output format as is.
+* A domain registered with your favorite registrar.  I use namecheap.com.
+* [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) must be installed.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) must be installed.
+* [jq](https://jqlang.github.io/jq/) must be installed.
+* AWS CLI must be configured with your credentials. You can do this in the AWS console under IAM -> Users -> Security Credentials -> Create Access Key.    Type `aws configure` and enter the access key and secret key.  You can leave the default region and output format as is.
 
 
 ### Installation
 
 * Change the variables in the **terraform.tfvars** file.
 * Run `./create-hosted-zone.sh` to automatically create the hosted zone in AWS Route53.
-* Login to your domain registrar and update the NS records for your domain to the ones printed by the script above.
+* Login to your domain registrar and update the NS records for your domain to the ones printed by the script above.  Wait a few minutes for the changes to propagate.
+  
 **If your domain's NS records are not yet pointed to AWS prior to running terraform, this script will timeout validating the certificate.**
 
 Run the following:
