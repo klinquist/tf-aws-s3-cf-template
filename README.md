@@ -47,6 +47,6 @@ terraform init
 terraform plan
 terrafom apply --auto-approve
 ```
-* (optional) Run `./add-secrets-to-repo.sh` to show the appropriate keys and optionally add them directly to the repo using the "gh" cli.   This is needed if you want to use the github action to deploy your website to the bucket (using something like Jekyll).
+* (optional) Run `./add-secrets-to-repo.sh` to show the appropriate keys and optionally add them directly to a repo using the "gh" (github) cli.  This makes the secrets available to a github action that you can use to deploy your website to the s3 bucket.  I use [Jekyll](https://jekyllrb.com) for actual website generation - it compiles markdown to HTML.   You can see my Jekyll github action in `sample-github-action/build-and-deploy.yml`.  I place this in the `.github/workflows` directory of my repo. 
 
 Note: This creates resources in `us-east-1`.  If you want to change the default region, you can do so by editing `main.tf`.
