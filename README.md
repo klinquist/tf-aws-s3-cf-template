@@ -17,7 +17,7 @@ This is a Terraform module that does the following:
 * Creates a Route53 record for the domain name (adding www. as a CNAME)
 * Creates an IAM user & policy for a github action.  Warning: Check the permissions, they are too liberal right now :).
 * (optional) Creates Route53 MX records and TXT validation record for Google Workspace
-* 
+  
 AND
 
 This is a shell script that:
