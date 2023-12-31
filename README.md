@@ -1,5 +1,3 @@
-## Information
-
 Regularly register a domain and want to put some web content there?
 
 This repo includes:
@@ -29,7 +27,6 @@ A shell script that:
 
 ### Prerequisites
 
-
 * A domain registered with your favorite registrar.  I use namecheap.com.
 * [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) must be installed.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) must be installed.
@@ -37,8 +34,9 @@ A shell script that:
 * AWS CLI must be configured with your credentials. You can do this in the AWS console under IAM -> Users -> Security Credentials -> Create Access Key.    Type `aws configure` and enter the access key and secret key.  You can leave the default region and output format as is.
 
 
-### Installation
+### Usage
 
+* Clone this repo!
 * Change the variables in the **terraform.tfvars** file.
 * Run `./create-hosted-zone.sh` to automatically create the hosted zone in AWS Route53.
 * Login to your domain registrar and update the NS records for your domain to the ones printed by the script above.  Wait a few minutes for the changes to propagate.
@@ -56,11 +54,11 @@ terrafom apply --auto-approve
 Note: This creates resources in `us-east-1`.  If you want to change the default region, you can do so by editing `main.tf`.
 
 
-### Usage (if not using a github action to auto-deploy)
+### Adding web content (if not using a github action to auto-deploy)
 
 Upload your web content (index.html, etc) to your new S3 bucket (domainname.com).  This can be done via aws cli (using a command like `aws s3 sync <source> s3://<domainname.com> --acl public-read --delete --cache-control max-age=604800`), or via a client like Panic Transmit.  After making a change, you'll want to create a cloudfront invalidation to remove the cache. 
 
-To do this via CLI, get the distribution:
+To do this via CLI, get the distribution ID:
 `terraform state pull | jq -r '.resources[] | select(.type == "aws_cloudfront_distribution") | .instances[0].attributes.id'`
 
 Then, create the invalidation:
