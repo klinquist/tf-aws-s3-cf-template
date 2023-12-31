@@ -16,25 +16,24 @@ This also assumes you want to receive email there and use a Google Workspace acc
 
 ### Prerequisites
 
-Before the deployment of this terraform module, make sure your hosted zone exists in Route 53 and move your domain to Route53 by changing NS records on your domain registrar. **If your domain's NS records are not yet pointed to AWS, this script will timeout validating the certificate.**
 
+1. [Install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+2. [Install AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+3. Generate an access key for your AWS account and add it to your environment.  You can do this in the AWS console under IAM -> Users -> Security Credentials -> Create Access Key.    Now, type `aws configure` and enter the access key and secret key.  You can leave the default region and output format as is.
+4. Create a hosted zone in Route53 for your domain (shell script to perform this step is included, see installation below)
+5. Login to your domain registrar and change the NS records to point to AWS (shell script to print NS is included, see installation below).
+
+**If your domain's NS records are not yet pointed to AWS prior to running terraform, this script will timeout validating the certificate.**
 
 ### Installation
 
 * Change the variables in the **terraform.tfvars** file.
-* Make sure you have AWS credentials in your environment and terraform installed
+* (optional) run `./create-hosted-zone.sh` to automatically create the hosted zone (step 4 above).
 
 Run the following:
 ```
 terraform init
 terraform plan
 terrafom apply --auto-approve
-
 ```
-
-
-### What do I do now?
-
-Upload a webpage to your s3 bucket.
-
-I personally use Jekyll to create a static website from markdown, and a github action to deploy it to the bucket.  Run `./add-secrets-to-repo.sh` to show the appropriate keys and optionally add them directly to the repo using the "gh" cli.
+* (optional) run `./add-secrets-to-repo.sh` to show the appropriate keys and optionally add them directly to the repo using the "gh" cli.   This is needed if you want to use the github action to deploy your website to the bucket (using something like Jekyll).
