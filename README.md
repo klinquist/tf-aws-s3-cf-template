@@ -16,14 +16,13 @@ This is a Terraform module that does the following:
 * Creates an SSL certificate for the domain name (adding www. as a subject alternative name)
 * Creates a Route53 record for the domain name (adding www. as a CNAME)
 * Creates an IAM user & policy for a github action.  Warning: Check the permissions, they are too liberal right now :).
-
+* (optional) Creates Route53 MX records and TXT validation record for Google Workspace
+* 
 AND
 
 This is a shell script that:
 * Adds AWS credentials to your github repo secrets so you can use the github action to deploy your website to the bucket (using something like Jekyll).
 
-
-This also assumes you want to receive email there and use a Google Workspace account for that - so the variables file includes the TXT record that you must add for Google verification.  If you don't, you can remove the MX record from the Route53 zone.
 
 
 

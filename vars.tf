@@ -2,6 +2,9 @@ variable "SiteTags" {}
 
 variable "domainName" {}
 
-variable "gmailTxtRecord" {}
+variable "gmailTxtRecord" {
+    type = "string"
+    default = ""
+}
 
 variable "dnsTtl" {}

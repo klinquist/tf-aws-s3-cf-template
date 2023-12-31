@@ -68,10 +68,11 @@ resource "aws_route53_record" "web-www" {
 
 
 resource "aws_route53_record" "gmail" {
+  count = var.gmailTxtRecord != "" ? 1 : 0
   zone_id = data.aws_route53_zone.public.id
   name    = var.domainName
-  type = "MX"
-  ttl = 300
+  type    = "MX"
+  ttl     = 300
   records = [
     "1 ASPMX.L.GOOGLE.COM",
     "5 ALT1.ASPMX.L.GOOGLE.COM",
@@ -81,13 +82,11 @@ resource "aws_route53_record" "gmail" {
   ]
 }
 
-
 resource "aws_route53_record" "gmail-txt-verification" {
+  count = var.gmailTxtRecord != "" ? 1 : 0
   zone_id = data.aws_route53_zone.public.id
   name    = var.domainName
-  type = "TXT"
-  ttl = 300
-  records = [
-    var.gmailTxtRecord,
-  ]
+  type    = "TXT"
+  ttl     = 300
+  records = [var.gmailTxtRecord]
 }
