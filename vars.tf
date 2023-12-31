@@ -3,7 +3,7 @@ variable "SiteTags" {}
 variable "domainName" {}
 
 variable "gmailTxtRecord" {
-    type = "string"
+    type = string
     default = ""
 }
 
