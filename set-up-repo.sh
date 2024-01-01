@@ -1,5 +1,36 @@
 #!/bin/bash
 
+
+# Define the Terraform variable file path
+file_path="terraform.tfvars"
+
+
+
+get_domain_name() {
+    # Check if file exists
+    if [ ! -f "$file_path" ]; then
+        echo "File not found: $file_path"
+        exit 1
+    fi
+
+    # Read the file and extract the domainName value
+    while IFS='=' read -r key value
+    do
+        if [[ $key == *"domainName"* ]]; then
+            # Trim leading and trailing spaces and quotes
+            domain_name=$(echo "$value" | xargs | tr -d '"')
+            break
+        fi
+    done < "$file_path"
+
+    # Check if domain_name is extracted
+    if [ -z "$domain_name" ]; then
+        echo "domainName not found in the file."
+        exit 1
+    fi
+
+}
+
 # Function to install jq based on the platform
 install_jq() {
     case "$(uname -s)" in
@@ -59,7 +90,7 @@ SECRET=$(terraform state pull | jq -r '.resources[] | select(.type == "aws_iam_a
 
 
 function showSecrets () {
-    echo "Create the following action secrets in your git repo:"
+    echo "Create the following action secrets in your git repo if you want to set up auto-deployment in the future."
     echo ""
     echo "AWS_S3_BUCKET_NAME=$BUCKET"
     echo "AWS_CLOUDFRONT_DISTRIBUTION_ID=$CLOUDFRONT_ID"
@@ -82,21 +113,31 @@ if ! gh auth status &> /dev/null; then
     exit 1
 fi
 
+
+
+
 # Ask the user if they want to add secrets to their repo
-read -r -p "Do you want to automatically add secrets to your repo using the 'gh' github CLI command? (y/n) " answer
+read -r -p "Do you want to create a new repository from this folder, commit all files, and set up a github action to auto-deploy the '_site' subfolder to s3? " answer
 case $answer in
     [Yy]* )
-        # Ask for the repo name
-        read -r -p "Enter the repository name (username/repo): " repo_name
-        
-        
-        # Add secrets to repo
-        gh secret set AWS_S3_BUCKET_NAME -b "$BUCKET" -R "$repo_name" -a actions
-        gh secret set AWS_CLOUDFRONT_DISTRIBUTION_ID -b "$CLOUDFRONT_ID" -R "$repo_name" -a actions
-        gh secret set AWS_ACCESS_KEY_ID -b "$ACCESS_KEY" -R "$repo_name" -a actions
-        gh secret set AWS_SECRET_ACCESS_KEY -b "$SECRET" -R "$repo_name" -a actions
-
-        echo "done!"
+        get_domain_name
+        rm -rf .git
+        git init
+        mkdir -p .github/workflows
+        mv sample-github-action/build-and-deploy.yml .github/workflows/deploy.yml
+        rm -rf sample-github-action
+        echo "Creating repo $domain_name"
+        gh repo create "$domain_name" --private --source=. --remote=upstream
+        echo "Adding secrets to repo..."
+        gh secret set AWS_S3_BUCKET_NAME -b "$BUCKET" -a actions
+        gh secret set AWS_CLOUDFRONT_DISTRIBUTION_ID -b "$CLOUDFRONT_ID" --a actions
+        gh secret set AWS_ACCESS_KEY_ID -b "$ACCESS_KEY" -a actions
+        gh secret set AWS_SECRET_ACCESS_KEY -b "$SECRET" -a actions
+        echo "Committing files to repo..."
+        git add ./*
+        git commit -m "Initial commit"
+        git push -u origin main
+        echo "Done! In a few minutes, your site should be available at https://www.$domain_name"
         exit 0
         ;;
     [Nn]* )

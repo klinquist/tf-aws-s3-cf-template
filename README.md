@@ -20,7 +20,10 @@ A Terraform module that does the following:
 AND
 
 A shell script that:
-* Adds AWS credentials to your github repo secrets so you can use the github action to deploy your website to the bucket (using something like Jekyll).
+* Creates a new private github repo (called domainname.com) in your github account
+* Commits all files in the current directory to the repo
+* Adds AWS credentials to your github repo secrets so you can use the github action to deploy your website to the S3 bucket
+* Sets up a github action to auto-deploy
 
 
 
@@ -32,6 +35,7 @@ A shell script that:
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) must be installed.
 * [jq](https://jqlang.github.io/jq/) must be installed.
 * AWS CLI must be configured with your credentials. You can do this in the AWS console under IAM -> Users -> Security Credentials -> Create Access Key.    Type `aws configure` and enter the access key and secret key.  You can leave the default region and output format as is.
+* (optional) [gh](https://cli.github.com) Github CLI must be installed (and logged in) to create a new private repo and set up github actions.
 
 
 ### Usage
@@ -49,17 +53,11 @@ terraform init
 terraform plan
 terrafom apply --auto-approve
 ```
-* (optional) Run `./add-secrets-to-repo.sh` to show the appropriate keys and optionally add them directly to a repo using the "gh" (github) cli.  This makes the secrets available to a github action that you can use to deploy your website to the s3 bucket.  I use [Jekyll](https://jekyllrb.com) for actual website generation - it compiles markdown to HTML.   You can see my Jekyll github action in `sample-github-action/build-and-deploy.yml`.  I place this in the `.github/workflows` directory of my repo. 
-
+* (optional) Run `./set-up-repo.sh` to create a new private repository on github, set up github actions, and add AWS credentials to your github repo secrets.   This will make a sample site available on https://www.domainname.com!  
+* 
 Note: This creates resources in `us-east-1`.  If you want to change the default region, you can do so by editing `main.tf`.
 
 
-### Adding web content (if not using a github action to auto-deploy)
+### Editing your web page
 
-Upload your web content (index.html, etc) to your new S3 bucket (domainname.com).  This can be done via aws cli (using a command like `aws s3 sync <source> s3://<domainname.com> --acl public-read --delete --cache-control max-age=604800`), or via a client like Panic Transmit.  After making a change, you'll want to create a cloudfront invalidation to remove the cache. 
-
-To do this via CLI, get the distribution ID:
-`terraform state pull | jq -r '.resources[] | select(.type == "aws_cloudfront_distribution") | .instances[0].attributes.id'`
-
-Then, create the invalidation:
-`aws cloudfront create-invalidation --distribution-id <distribution_id> --paths "/*"`
+Simply commit your changes to the "_site" folder and push to github.  The github action will automatically deploy your changes to the S3 bucket and invalidate the CloudFront cache.  Your changes should be live in a few minutes.
