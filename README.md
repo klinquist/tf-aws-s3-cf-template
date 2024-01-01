@@ -54,7 +54,8 @@ terraform plan
 terrafom apply --auto-approve
 ```
 * (optional) Run `./set-up-repo.sh` to create a new private repository on github, set up github actions, and add AWS credentials to your github repo secrets.   This will make a sample site available on https://www.domainname.com!  
-* 
+
+
 Note: This creates resources in `us-east-1`.  If you want to change the default region, you can do so by editing `main.tf`.
 
 
