@@ -34,7 +34,7 @@ install_jq() {
 # Check if jq is installed
 if ! command -v jq &> /dev/null; then
     echo "jq is not installed."
-    read -p "Do you want to install jq? (y/n) " install_answer
+    read -r -p "Do you want to install jq? (y/n) " install_answer
     case $install_answer in
         [Yy]* )
             install_jq
@@ -85,7 +85,7 @@ while IFS='=' read -r key value
 do
     if [[ $key == *"domainName"* ]]; then
         # Trim leading and trailing spaces and quotes
-        domain_name=$(echo $value | xargs | tr -d '"')
+        domain_name=$(echo "$value" | xargs | tr -d '"')
         break
     fi
 done < "$file_path"
@@ -100,7 +100,7 @@ fi
 
 
 # Ask the user to confirm the domain name
-read -p "Is $domain_name the domain name you want to add to AWS Route53? (yes/no) " user_response
+read -r -p "Is $domain_name the domain name you want to add to AWS Route53? (yes/no) " user_response
 
 # Convert the response to lowercase
 user_response=$(echo "$user_response" | awk '{print tolower($0)}')
@@ -125,19 +125,13 @@ esac
 # Create a hosted zone using the AWS CLI
 echo "Creating hosted zone in AWS Route 53..."
 
-output=$(aws route53 create-hosted-zone --name "$domain_name" --caller-reference "$(date +%s)")
-
-# Check if the hosted zone was created successfully
-if [ $? -ne 0 ]; then
+if ! output=$(aws route53 create-hosted-zone --name "$domain_name" --caller-reference "$(date +%s)"); then
     echo "Failed to create hosted zone."
     exit 1
 fi
 
 # Extract the hosted zone ID from the command output
-hosted_zone_id=$(echo "$output" | jq -r '.HostedZone.Id' | awk -F'/' '{print $3}')
-
-# Check if hosted zone ID is extracted
-if [ -z "$hosted_zone_id" ]; then
+if ! hosted_zone_id=$(echo "$output" | jq -r '.HostedZone.Id' | awk -F'/' '{print $3}'); then
     echo "Failed to extract hosted zone ID."
     exit 1
 fi
@@ -147,10 +141,7 @@ echo "Hosted Zone ID: $hosted_zone_id"
 echo "Getting name servers..."
 
 # Get hosted zone details
-output=$(aws route53 get-hosted-zone --id "$hosted_zone_id")
-
-# Check if the command was successful
-if [ $? -ne 0 ]; then
+if ! output=$(aws route53 get-hosted-zone --id "$hosted_zone_id"); then
     echo "Failed to get hosted zone details."
     exit 1
 fi

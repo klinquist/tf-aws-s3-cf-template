@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Function to install jq based on the platform
 install_jq() {
     case "$(uname -s)" in
@@ -32,7 +34,7 @@ install_jq() {
 # Check if jq is installed
 if ! command -v jq &> /dev/null; then
     echo "jq is not installed."
-    read -p "Do you want to install jq? (y/n) " install_answer
+    read -r -p "Do you want to install jq? (y/n) " install_answer
     case $install_answer in
         [Yy]* )
             install_jq
@@ -81,18 +83,18 @@ if ! gh auth status &> /dev/null; then
 fi
 
 # Ask the user if they want to add secrets to their repo
-read -p "Do you want to automatically add secrets to your repo using the 'gh' github CLI command? (y/n) " answer
+read -r -p "Do you want to automatically add secrets to your repo using the 'gh' github CLI command? (y/n) " answer
 case $answer in
     [Yy]* )
         # Ask for the repo name
-        read -p "Enter the repository name (username/repo): " repo_name
+        read -r -p "Enter the repository name (username/repo): " repo_name
         
         
         # Add secrets to repo
-        gh secret set AWS_S3_BUCKET_NAME -b $BUCKET -R $repo_name -a actions
-        gh secret set AWS_CLOUDFRONT_DISTRIBUTION_ID -b $CLOUDFRONT_ID -R $repo_name -a actions
-        gh secret set AWS_ACCESS_KEY_ID -b $ACCESS_KEY -R $repo_name -a actions
-        gh secret set AWS_SECRET_ACCESS_KEY -b $SECRET -R $repo_name -a actions
+        gh secret set AWS_S3_BUCKET_NAME -b "$BUCKET" -R "$repo_name" -a actions
+        gh secret set AWS_CLOUDFRONT_DISTRIBUTION_ID -b "$CLOUDFRONT_ID" -R "$repo_name" -a actions
+        gh secret set AWS_ACCESS_KEY_ID -b "$ACCESS_KEY" -R "$repo_name" -a actions
+        gh secret set AWS_SECRET_ACCESS_KEY -b "$SECRET" -R "$repo_name" -a actions
 
         echo "done!"
         exit 0
