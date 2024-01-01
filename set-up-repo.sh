@@ -84,6 +84,12 @@ fi
 
 echo "Getting secrets from terraform state..."
 BUCKET=$(terraform state pull | jq -r '.resources[] | select((.type == "aws_s3_bucket") and (.name == "my_site_bucket")) | .instances[0].attributes.id')
+
+if [ -z "$BUCKET" ]; then
+    echo "Could not find cloudfront distribution id in terraform state. Did you run 'terraform apply'?  Please see the README for more information."
+    exit 1
+fi
+
 CLOUDFRONT_ID=$(terraform state pull | jq -r '.resources[] | select(.type == "aws_cloudfront_distribution") | .instances[0].attributes.id')
 ACCESS_KEY=$(terraform state pull | jq -r '.resources[] | select(.type == "aws_iam_access_key") | .instances[0].attributes.id')
 SECRET=$(terraform state pull | jq -r '.resources[] | select(.type == "aws_iam_access_key") | .instances[0].attributes.secret')
@@ -121,6 +127,7 @@ read -r -p "Do you want to create a new repository from this folder, commit all 
 case $answer in
     [Yy]* )
         get_domain_name
+        # Remove existing git repo (that was cloned from the template)
         rm -rf .git
         git init
         mkdir -p .github/workflows
