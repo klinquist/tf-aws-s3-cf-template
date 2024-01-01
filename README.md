@@ -47,7 +47,7 @@ A shell script that:
   
 **If your domain's NS records are not yet pointed to AWS prior to running terraform, this script will timeout validating the certificate.**
 
-Run the following:
+Run the following to deploy the infrastructure:
 ```
 terraform init
 terraform plan
