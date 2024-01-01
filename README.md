@@ -43,7 +43,7 @@ A shell script that:
 * Clone this repo!
 * Change the variables in the **terraform.tfvars** file.
 * Run `./create-hosted-zone.sh` to automatically create the hosted zone in AWS Route53.
-* Login to your domain registrar and update the NS records for your domain to the ones printed by the script above.  Wait a few minutes for the changes to propagate.
+* Login to your domain registrar and update the NS records for your domain to the ones printed by the script above.  **Wait up to 30 minutes for the changes to propagate.**
   
 **If your domain's NS records are not yet pointed to AWS prior to running terraform, this script will timeout validating the certificate.**
 
