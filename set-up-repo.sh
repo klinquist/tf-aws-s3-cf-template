@@ -134,15 +134,20 @@ case $answer in
         mv sample-github-action/build-and-deploy.yml .github/workflows/deploy.yml
         rm -rf sample-github-action
         echo "Creating repo $domain_name"
-        gh repo create "$domain_name" --private --source=. --remote=upstream
+        gh repo create "$domain_name" --private --source=. --remote=origin
         echo "Adding secrets to repo..."
-        gh secret set AWS_S3_BUCKET_NAME -b "$BUCKET" -a actions
-        gh secret set AWS_CLOUDFRONT_DISTRIBUTION_ID -b "$CLOUDFRONT_ID" --a actions
-        gh secret set AWS_ACCESS_KEY_ID -b "$ACCESS_KEY" -a actions
-        gh secret set AWS_SECRET_ACCESS_KEY -b "$SECRET" -a actions
+        gh secret set "AWS_S3_BUCKET_NAME" -b "$BUCKET" -a actions
+        gh secret set "AWS_CLOUDFRONT_DISTRIBUTION_ID" -b "$CLOUDFRONT_ID" -a actions
+        gh secret set "AWS_ACCESS_KEY_ID" -b "$ACCESS_KEY" -a actions
+        gh secret set "AWS_SECRET_ACCESS_KEY" -b "$SECRET" -a actions
         echo "Committing files to repo..."
         git add ./*
+        git add .github
+        git add .gitignore
+        git add .terraform.lock.hcl
+        git add .terraform
         git commit -m "Initial commit"
+        git branch -M main
         git push -u origin main
         echo "Done! In a few minutes, your site should be available at https://www.$domain_name"
         exit 0
