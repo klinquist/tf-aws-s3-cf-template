@@ -40,7 +40,12 @@ A shell script that:
 
 ### Usage
 
-* Clone this repo!
+* Clone this repo! I reocmmend cloning it into a directory named after your domain name.  e.g. 
+```bash
+mkdir <domainname.com>
+cd <domainname.com>
+git clone https://github.com/klinquist/tf-aws-s3-cf-template.git .
+```
 * Change the variables in the **terraform.tfvars** file.
 * Run `./create-hosted-zone.sh` to automatically create the hosted zone in AWS Route53.
 * Login to your domain registrar and update the NS records for your domain to the ones printed by the script above.  **Wait up to 30 minutes for the changes to propagate.**
@@ -61,7 +66,9 @@ Note: This creates resources in `us-east-1`.  If you want to change the default 
 
 ### Editing your web page
 
-Simply commit your changes to the "_site" folder and push to github.  The github action will automatically deploy your changes to the S3 bucket and invalidate the CloudFront cache.  Your changes should be live in a few minutes.
+If you ran "set-up-repo.sh", you can simply commit changes to the "_site" folder and push to github.  The github action will automatically deploy your changes to the S3 bucket and invalidate the CloudFront cache.  Your changes should be live in a few minutes.
+
+If you did not run "set-up-repo.sh", put your changes in the "domainname.com" S3 bucket and manually invalidate the CloudFront cache.  
 
 
 ### Undoing everything!
