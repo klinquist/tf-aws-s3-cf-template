@@ -65,7 +65,7 @@ install_jq() {
 # Check if jq is installed
 if ! command -v jq &> /dev/null; then
     echo "jq is not installed."
-    read -r -p "Do you want to install jq? (y/n) " install_answer
+    read -r -p "Do you want to install jq? (y/n): " install_answer
     case $install_answer in
         [Yy]* )
             install_jq
@@ -123,7 +123,7 @@ fi
 
 
 # Ask the user if they want to add secrets to their repo
-read -r -p "Do you want to create a new repository from this folder, commit all files, and set up a github action to auto-deploy the '_site' subfolder to s3? " answer
+read -r -p "Do you want to create a new repository from this folder, commit all files, and set up a github action to auto-deploy the '_site' subfolder to s3? (y/n): " answer
 case $answer in
     [Yy]* )
         get_domain_name

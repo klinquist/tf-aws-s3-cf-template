@@ -62,3 +62,12 @@ Note: This creates resources in `us-east-1`.  If you want to change the default 
 ### Editing your web page
 
 Simply commit your changes to the "_site" folder and push to github.  The github action will automatically deploy your changes to the S3 bucket and invalidate the CloudFront cache.  Your changes should be live in a few minutes.
+
+
+### Undoing everything!
+
+This repo contains a shell script called `./destroy-all.sh` which will:
+* Remove everything from the S3 buckets
+* Run 'terraform destroy' to remove all terraform-managed resources
+* Delete the hosted zone from Route53
+* Delete the github repo

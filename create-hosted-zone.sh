@@ -95,12 +95,17 @@ if [ -z "$domain_name" ]; then
     echo "domainName not found in the file."
     exit 1
 else
+    if [[ $domain_name == *"YourDomainHere.com"* ]]; then
+        echo "It appears that you have not yet edited the 'terraform.tfvars' file to specify your custom domain name.  Please do that first."
+        exit 1
+    fi
+
     echo "Extracted domainName: $domain_name"
 fi
 
 
 # Ask the user to confirm the domain name
-read -r -p "Is $domain_name the domain name you want to add to AWS Route53? (yes/no) " user_response
+read -r -p "Is $domain_name the domain name you want to add to AWS Route53? (y/n): " user_response
 
 # Convert the response to lowercase
 user_response=$(echo "$user_response" | awk '{print tolower($0)}')
@@ -149,5 +154,6 @@ fi
 # Extract and output the name servers
 echo "Name Servers for Hosted Zone ID $hosted_zone_id:"
 echo "(Login to your domain registrar and update the name servers to these values.)"
+echo "After updating the nameservers with your registrar, wait a few minutes and then run the next commands outlined in the README."
 echo ""
 echo "$output" | jq -r '.DelegationSet.NameServers[]'
