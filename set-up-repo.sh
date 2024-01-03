@@ -145,7 +145,6 @@ case $answer in
         git add .github
         git add .gitignore
         git add .terraform.lock.hcl
-        git add .terraform
         git commit -m "Initial commit"
         git branch -M main
         git push -u origin main

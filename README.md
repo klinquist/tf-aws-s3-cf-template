@@ -56,7 +56,7 @@ Run the following to deploy the infrastructure:
 ```
 terraform init
 terraform plan
-terrafom apply --auto-approve
+terraform apply --auto-approve
 ```
 * (optional) Run `./set-up-repo.sh` to create a new private repository on github, set up github actions, and add AWS credentials to your github repo secrets.   This will make a sample site available on https://www.domainname.com!  
 
