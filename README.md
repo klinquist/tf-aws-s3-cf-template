@@ -40,7 +40,7 @@ A shell script that:
 
 ### Usage
 
-* Clone this repo! I reocmmend cloning it into a directory named after your domain name.  e.g. 
+* Clone this repo! I recommend cloning it into a directory named after your domain name.  e.g. 
 ```bash
 mkdir <domainname.com>
 cd <domainname.com>
@@ -50,7 +50,7 @@ git clone https://github.com/klinquist/tf-aws-s3-cf-template.git .
 * Run `./create-hosted-zone.sh` to automatically create the hosted zone in AWS Route53.
 * Login to your domain registrar and update the NS records for your domain to the ones printed by the script above.  **Wait up to 30 minutes for the changes to propagate.**
   
-**If your domain's NS records are not yet pointed to AWS prior to running terraform, this script will timeout validating the certificate.**
+**If your domain's NS records are not pointed to AWS before running terraform, this script will timeout validating the certificate.**
 
 Run the following to deploy the infrastructure:
 ```
