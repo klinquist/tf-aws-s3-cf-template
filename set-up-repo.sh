@@ -147,7 +147,7 @@ cat << EOF > $new_script_name
 # Auto-created by https://www.github.com/klinquist/tf-aws-s3-cf-template
 
 # Sync _site directory with S3 bucket
-aws s3 sync _site/* s3://$domain_name --acl public-read --delete --cache-control max-age=604800
+aws s3 sync ./_site/ s3://$domain_name --acl public-read --delete --cache-control max-age=604800
 
 # Invalidate CloudFront cache
 aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"

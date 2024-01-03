@@ -24,6 +24,7 @@ A shell script that:
 * Commits all files in the current directory to the repo
 * Adds AWS credentials to your github repo secrets so you can use the github action to deploy your website to the S3 bucket
 * Sets up a github action to auto-deploy
+* Creates a shell script called "manually-deploy.sh" that you can use to manually deploy your website to the S3 bucket
 
 
 
