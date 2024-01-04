@@ -21,7 +21,7 @@ Many companies offer all of these parts - or some combination of parts (squaresp
 * AWS: Amazon Web Services
 * S3: Simple Storage Service, an AWS service for storing files.  This is where your website will be stored.
 * CloudFront: AWS's content delivery network (CDN).   This will cache your website's content at edge locations around the world, making your website faster for users.  It will also make your website secure (https) by providing an SSL certificate.
-* DNS: Domain Name System.  This is the phone book for the internet.  It translates domain names (like www.domainname.com) into IP addresses (like 1.2.3.4).
+* DNS: Domain Name Server.  This is the phone book for the internet.  It translates domain names (like www.domainname.com) into IP addresses (like 1.2.3.4).
 * Route53: AWS's DNS service.  This will allow you to point your domain name to your website.
 * Terraform: A tool for managing infrastructure as code.  Terraform is used to configure the AWS resources.
 * GitHub Actions: A tool for automating tasks in GitHub.  We will use this to automatically deploy your website to S3 when you commit changes to your GitHub repo.  Github offers up to 2000 minutes of free GitHub actions per month.  This should be plenty for a personal website.
@@ -41,26 +41,26 @@ Many companies offer all of these parts - or some combination of parts (squaresp
    * Creates a CloudFront distribution
    * Creates an SSL certificate for the domain name (adding www. as a subject alternative name)
    * Creates a Route53 record for the domain name (adding www. as a CNAME)
-   * Creates an IAM user & policy for a github action.  Warning: Check the permissions, they are too liberal right now :).
+   * Creates an IAM user & policy for a GitHub action.  Warning: Check the permissions, they are too liberal right now :).
    * (optional) Creates Route53 MX records and TXT validation record for Google Workspace
 3. `./set-up-repo.sh`: A shell script that:
-   * Creates a new private github repo (called domainname.com) in your github account
+   * Creates a new private GitHub repo (called domainname.com) in your GitHub account
    * Commits all files in the current directory to the repo
-   * Adds AWS credentials to your github repo secrets so you can use the github action to deploy your website to the S3 bucket
-   * Sets up a github action to auto-deploy
+   * Adds AWS credentials to your GitHub repo secrets so you can use the GitHub action to deploy your website to the S3 bucket
+   * Sets up a GitHub action to auto-deploy
    * Creates a shell script called "manually-deploy.sh" that you can use to manually deploy your website to the S3 bucket
 
 
 
 ### Prerequisites
 
-* A github account
+* A GitHub account
 * A domain registered with your favorite registrar.  I use namecheap.com.
 * [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) must be installed.
 * An account with AWS.  You can sign up for an account [here](https://portal.aws.amazon.com/billing/signup).
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) must be installed and configured with **FullAccess** (configure it by typing `aws configure sso`, more information can be found [here](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html#getting-started-quickstart-new-command)).
 * [jq](https://jqlang.github.io/jq/) must be installed. This is a command-line JSON processor used by the shell scripts.
-* [gh](https://cli.github.com) Github CLI must be installed (and logged in) to create a new private repo and set up github actions.
+* [gh](https://cli.github.com) Github CLI must be installed (and logged in) to create a new private repo and set up GitHub actions.
 
 
 ### Usage
@@ -83,7 +83,7 @@ terraform init
 terraform apply --auto-approve
 ```
 
-6. Run `./set-up-repo.sh` to create a new private repository on github, set up github actions, and add AWS credentials to your github repo secrets.   This will make a sample site available on https://www.domainname.com!  
+6. Run `./set-up-repo.sh` to create a new private repository on GitHub, set up GitHub actions, and add AWS credentials to your GitHub repo secrets.   This will make a sample site available on https://www.domainname.com!  
 
 
 Note: This creates resources in `us-east-1`.  If you want to change the default region, you can do so by editing `main.tf`.
@@ -101,12 +101,12 @@ This repo contains a shell script called `./destroy-all.sh` which will:
 * Remove everything from the S3 buckets
 * Run 'terraform destroy' to remove all terraform-managed resources
 * Delete the hosted zone from Route53
-* Delete the github repo
+* Delete the GitHub repo
 
 
 ### To-do
 
-* Use the github terraform provider instead of `gh` cli?  Still requires `gh` to be installed and authorized *or* a personal access token to be provided.   A shell script would still be required to commit files to the repository.
-* Set up the [Github-AWS OIDC connection](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services) rather than generating an AWS user w/ access key & secret.  This would make things more secure.
+* Use the GitHub terraform provider instead of `gh` cli?  Still requires `gh` to be installed and authorized *or* a personal access token to be provided.   A shell script would still be required to commit files to the repository.
+* Set up the [Github-AWS OIDC connection](https://docs.GitHub.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services) rather than generating an AWS user w/ access key & secret.  This would make things more secure.
 
 ### Pull requests welcome!
