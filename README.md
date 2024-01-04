@@ -3,9 +3,7 @@ Regularly register a domain and want to put some web content there?  This is a c
 ### What does hosting a website entail?
 
 1. Registering the domain name with a domain registrar.
-2. Configuring *authoritative name servers* for your website.  This tells the internet "Which server is responsible for the *phone book* for this domain name?"  
-    * A phone book (DNS) with a DNS provider must exist.
-    * Your domain registrar needs to know which DNS provider to use for your domain.
+2. Configuring *authoritative name servers* for your website. This involves establishing an account with a DNS provider and typing the address of the DNS servers into the registrar. This tells the internet "Which server is responsible for the *phone book* (DNS) for this domain name?"  
 3. Populating that phone book (DNS) with entries like "www" (what is the IP address that a browser should query when someone types www.domainname.com?)
 4. Hosting the website somewhere (html files and images stored on a computer that is internet accessible and running 24/7)
 
