@@ -79,3 +79,9 @@ This repo contains a shell script called `./destroy-all.sh` which will:
 * Run 'terraform destroy' to remove all terraform-managed resources
 * Delete the hosted zone from Route53
 * Delete the github repo
+
+
+### To-do
+
+* Use the github terraform provider instead of `gh` cli?  Still requires `gh` to be installed and authorized *or* a personal access token to be provided.   A shell script would still be required to commit files to the repository.
+* Set up the [Github-AWS OIDC connection](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services) rather than generating an AWS user w/ access key & secret.  This would make things more secure.
