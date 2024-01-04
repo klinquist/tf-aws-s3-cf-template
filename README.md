@@ -6,14 +6,25 @@ Regularly register a domain and want to put some web content there?  This is a c
 2. Configuring *authoritative name servers* for your website.  This tells the internet "Which server is responsible for the *phone book* for this domain name?"  
     * A phone book (DNS) with a DNS provider must exist.
     * Your domain registrar needs to know which DNS provider to use for your domain.
-3. You must populate that phone book (DNS) with entries like "www" (what is the IP address that a browser should query when someone types www.domainname.com?)
-4. Finally, you must have the website hosted somewhere (html files and images stored on a computer that is internet accessible and running 24/7)
+3. Populating that phone book (DNS) with entries like "www" (what is the IP address that a browser should query when someone types www.domainname.com?)
+4. Hosting the website somewhere (html files and images stored on a computer that is internet accessible and running 24/7)
 
-Many companies offer all of these parts - or some combination of parts (squarespace, wix, etc).  However, you rarely have full control over each, and they tend to be expensive!  This project is meant to be a starting point for people who:
-* Want to write their own HTML/CSS/JS (or use templates)
+Many companies offer all of these parts - or some combination of parts (squarespace, wix, etc).  However, you rarely have full control over each, and they tend to be expensive!  
+
+**This project is meant to be a starting point for people who:**
+
+* Want to write their own HTML/CSS/JS or use:
+  * Jekyll/Hugo or similar: Static site generators
+  * Vue/ReactJS or similar: Javascript frameworks
 * Want to learn more about DNS and infrastructure as code
 * Want to learn more about Amazon Web Services
+* Want to learn more about CI/CD and GitHub Actions
 * Want to host a website for as little money as possible
+* Want to extend this project to include other AWS resources for dynamic sites (e.g. serverless functions, databases, etc)
+
+**This project is NOT ideal for people who:**
+
+* Want to run Wordpress, Drupal, or another SQL and PHP based CMS.
   
 
 
@@ -22,9 +33,10 @@ Many companies offer all of these parts - or some combination of parts (squaresp
 * S3: Simple Storage Service, an AWS service for storing files.  This is where your website will be stored.
 * CloudFront: AWS's content delivery network (CDN).   This will cache your website's content at edge locations around the world, making your website faster for users.  It will also make your website secure (https) by providing an SSL certificate.
 * DNS: Domain Name Server.  This is the phone book for the internet.  It translates domain names (like www.domainname.com) into IP addresses (like 1.2.3.4).
+* NS: Name Server.  This is a DNS server that is authoritative for a domain name.  It is responsible for answering queries about that domain name.
 * Route53: AWS's DNS service.  This will allow you to point your domain name to your website.
 * Terraform: A tool for managing infrastructure as code.  Terraform is used to configure the AWS resources.
-* GitHub Actions: A tool for automating tasks in GitHub.  We will use this to automatically deploy your website to S3 when you commit changes to your GitHub repo.  Github offers up to 2000 minutes of free GitHub actions per month.  This should be plenty for a personal website.
+* GitHub Actions: A tool for automating tasks in GitHub.  We will use this to automatically deploy your website to S3 when you commit changes to your GitHub repo.  Github offers up to 2000 minutes of free GitHub actions per month, which is plenty for a personal website.
 
 
 
