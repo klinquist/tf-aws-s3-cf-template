@@ -54,6 +54,7 @@ Many companies offer all of these parts - or some combination of parts (squaresp
 
 ### Prerequisites
 
+* A github account
 * A domain registered with your favorite registrar.  I use namecheap.com.
 * [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) must be installed.
 * An account with AWS.  You can sign up for an account [here](https://portal.aws.amazon.com/billing/signup).
