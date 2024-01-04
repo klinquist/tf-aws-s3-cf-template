@@ -48,7 +48,7 @@ Many companies offer all of these parts - or some combination of parts (squaresp
    * Adds a hosted zone in Route53 for your domain
    * Prints the NS records for your domain so you can update your registrar
 2. Terraform module that does the following:
-   * Creates an S3 bucket (domainname)
+   * Creates an S3 bucket (domainname) and static site hosting with `index.html` as the index document.
    * Creates a second S3 bucket for logs (domainname-logs) with a lifecycle policy to delete logs after 15 days
    * Creates a CloudFront distribution
    * Creates an SSL certificate for the domain name (adding www. as a subject alternative name)
