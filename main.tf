@@ -1,5 +1,5 @@
 provider "aws" {
-  region  = "us-east-1"
+  region = "us-east-1"
 }
 
 data "aws_route53_zone" "public" {
@@ -42,17 +42,17 @@ module "cloudfront" {
 module "route53" {
   source = "./modules/route53"
 
-  hosted_zone_id               = data.aws_route53_zone.public.zone_id
-  distribution_domain_name     = module.cloudfront.distribution_domain_name
-  distribution_hosted_zone_id  = module.cloudfront.hosted_zone_id
-  domain_name                  = var.domainName
-  gmail_txt_record             = var.gmailTxtRecord
+  hosted_zone_id              = data.aws_route53_zone.public.zone_id
+  distribution_domain_name    = module.cloudfront.distribution_domain_name
+  distribution_hosted_zone_id = module.cloudfront.hosted_zone_id
+  domain_name                 = var.domainName
+  gmail_txt_record            = var.gmailTxtRecord
 }
 
 module "iam_github" {
   source = "./modules/iam-github"
 
-  domain_name     = var.domainName
-  bucket_arn      = module.s3_site.site_bucket_arn
+  domain_name      = var.domainName
+  bucket_arn       = module.s3_site.site_bucket_arn
   distribution_arn = module.cloudfront.distribution_arn
 }
