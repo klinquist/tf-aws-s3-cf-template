@@ -1,13 +1,7 @@
 resource "aws_cloudfront_distribution" "my_cloudfront" {
-  depends_on = [
-    aws_s3_bucket.my_site_bucket,
-    aws_s3_bucket.log_bucket
-  ]
-
   origin {
-    domain_name = aws_s3_bucket_website_configuration.my_site_bucket.website_endpoint
+    domain_name = var.origin_website_endpoint
     origin_id   = "s3-cloudfront"
-
 
     custom_origin_config {
       http_port              = "80"
@@ -17,24 +11,23 @@ resource "aws_cloudfront_distribution" "my_cloudfront" {
     }
   }
 
-
   logging_config {
     include_cookies = false
-    bucket          = aws_s3_bucket.log_bucket.bucket_domain_name
+    bucket          = var.log_bucket_domain_name
     prefix          = ""
   }
 
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
-  aliases = [var.domainName, "www.${var.domainName}"]
-  
+  aliases             = var.aliases
+
   restrictions {
     geo_restriction {
       restriction_type = "none"
     }
   }
-  
+
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
@@ -53,21 +46,21 @@ resource "aws_cloudfront_distribution" "my_cloudfront" {
     default_ttl            = 3600
     max_ttl                = 86400
   }
+
   price_class = "PriceClass_200"
 
   tags = {
-    Environment = var.SiteTags
+    Environment = var.site_tags
   }
 
   viewer_certificate {
     cloudfront_default_certificate = true
-    acm_certificate_arn = aws_acm_certificate.certificate.arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+    acm_certificate_arn            = var.acm_certificate_arn
+    ssl_support_method             = "sni-only"
+    minimum_protocol_version       = "TLSv1.2_2021"
   }
-
 }
 
 resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
-  comment = "access-identity-${var.domainName}.s3.amazonaws.com"
+  comment = "access-identity-${var.domain_name}.s3.amazonaws.com"
 }
