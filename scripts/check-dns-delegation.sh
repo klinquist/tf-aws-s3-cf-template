@@ -108,6 +108,28 @@ check_once() {
     return 1
 }
 
+print_timeout_troubleshooting() {
+    echo ""
+    echo "Troubleshooting:"
+    echo "This script checks NS records through your system's configured DNS resolver."
+    echo "That resolver can cache old registrar delegation for a while, even after the domain has been updated."
+    echo ""
+    echo "Compare what different resolvers see:"
+    echo "  dig +short NS $DOMAIN_NAME"
+    echo "  dig @1.1.1.1 +short NS $DOMAIN_NAME"
+    echo "  dig @8.8.8.8 +short NS $DOMAIN_NAME"
+    echo ""
+    echo "You can also trace delegation from the DNS root:"
+    echo "  dig +trace NS $DOMAIN_NAME"
+    echo ""
+    echo "If those commands show the Route53 nameservers listed above, delegation is active."
+    echo "At that point it is reasonable to continue with:"
+    echo "  terraform init"
+    echo "  terraform apply"
+    echo ""
+    echo "If they still show registrar or parking nameservers, update the domain's nameservers at the registrar and wait a bit longer."
+}
+
 if [ "$WAIT" = false ]; then
     check_once
     exit $?
@@ -125,6 +147,7 @@ while true; do
     if [ "$ELAPSED" -ge "$TIMEOUT_SECONDS" ]; then
         echo ""
         echo "Timed out after ${TIMEOUT_SECONDS}s waiting for NS delegation."
+        print_timeout_troubleshooting
         exit 1
     fi
 
