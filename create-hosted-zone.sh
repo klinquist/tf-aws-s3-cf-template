@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Function to install jq based on the platform
 install_jq() {
     case "$(uname -s)" in
@@ -157,3 +159,18 @@ echo "(Login to your domain registrar and update the name servers to these value
 echo "After updating the nameservers with your registrar, wait a few minutes and then run the next commands outlined in the README."
 echo ""
 echo "$output" | jq -r '.DelegationSet.NameServers[]'
+
+echo ""
+echo "Checking public delegation and registrar guidance..."
+"$SCRIPT_DIR/scripts/check-dns-delegation.sh" "$domain_name" || true
+
+echo ""
+read -r -p "After updating nameservers at your registrar, do you want to wait here until public DNS points to Route53? (y/n): " wait_answer
+case $wait_answer in
+    [Yy]* )
+        "$SCRIPT_DIR/scripts/check-dns-delegation.sh" --wait "$domain_name"
+        ;;
+    * )
+        echo "Run ./scripts/check-dns-delegation.sh --wait when you are ready to poll again."
+        ;;
+esac

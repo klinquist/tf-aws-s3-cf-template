@@ -123,7 +123,7 @@ fi
 
 
 # Ask the user if they want to add secrets to their repo
-read -r -p "Do you want to create a new repository from this folder, commit all files, and set up a github action to auto-deploy the '_site' subfolder to s3? (y/n): " answer
+read -r -p "Do you want to create a new repository from this folder, commit all files, and set up a github action to build React and deploy the 'dist' folder to s3? (y/n): " answer
 case $answer in
     [Yy]* )
         ;;
@@ -146,8 +146,10 @@ cat << EOF > $new_script_name
 #!/bin/bash
 # Auto-created by https://www.github.com/klinquist/tf-aws-s3-cf-template
 
-# Sync _site directory with S3 bucket
-aws s3 sync ./_site/ s3://$domain_name --acl public-read --delete --cache-control max-age=604800
+# Build and sync dist directory with S3 bucket
+npm ci
+npm run build
+aws s3 sync ./dist/ s3://$domain_name --acl public-read --delete --cache-control max-age=604800
 
 # Invalidate CloudFront cache
 aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"
