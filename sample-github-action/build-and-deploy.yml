@@ -20,18 +20,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
-    - uses: actions/checkout@v2
-    # The following is if you want to use Jekyll:
-    # - name: Set up Ruby
-    #   uses: ruby/setup-ruby@v1
-    #   with:
-    #     bundler-cache: true
-    #     ruby-version: 3.1.2
-    # - name: "Build Site"
-    #   run: bundle exec jekyll build
-    #   env:
-    #     JEKYLL_ENV: production
+    - uses: actions/checkout@v4
+    - name: "Set up Node"
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: npm
+    - name: "Install dependencies"
+      run: npm ci
+    - name: "Build React site"
+      run: npm run build
     - name: "Deploy to AWS S3"
-      run: aws s3 sync ./_site/ s3://${{ secrets.AWS_S3_BUCKET_NAME }} --acl public-read --delete --cache-control max-age=604800
+      run: aws s3 sync ./dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME }} --acl public-read --delete --cache-control max-age=604800
     - name: "Create AWS Cloudfront Invalidation"
       run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"

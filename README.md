@@ -11,9 +11,10 @@ Many companies offer all of these parts - or some combination of parts (squaresp
 
 **This project is meant to be a starting point for people who:**
 
+* Want to start from the included React/Vite site or bring their own static build output
 * Want to write their own HTML/CSS/JS or use:
-  * Jekyll/Hugo or similar: Static site generators
-  * Vue/ReactJS or similar: Javascript frameworks
+  * React/Vue/Svelte or similar JavaScript frameworks
+  * Jekyll/Hugo/Astro or similar static site generators
 * Want to learn more about DNS and infrastructure as code
 * Want to learn more about Amazon Web Services
 * Want to learn more about CI/CD and GitHub Actions
@@ -45,6 +46,9 @@ Many companies offer all of these parts - or some combination of parts (squaresp
 1. `./create-hosted-zone.sh`: A shell script that:
    * Adds a hosted zone in Route53 for your domain
    * Prints the NS records for your domain so you can update your registrar
+   * Detects the current registrar through RDAP/whois when possible
+   * Prints registrar-specific nameserver instructions and useful links for common registrars
+   * Can wait and poll public DNS until the registrar delegates the domain to Route53
 2. Terraform module that does the following:
    * Creates an S3 bucket (domainname) and static site hosting with `index.html` as the index document.
    * Creates a second S3 bucket for logs (domainname-logs) with a lifecycle policy to delete logs after 15 days
@@ -57,8 +61,16 @@ Many companies offer all of these parts - or some combination of parts (squaresp
    * Creates a new private GitHub repo (called domainname.com) in your GitHub account
    * Commits all files in the current directory to the repo
    * Adds AWS credentials to your GitHub repo secrets so you can use the GitHub action to deploy your website to the S3 bucket
-   * Sets up a GitHub action to auto-deploy
+   * Sets up a GitHub action to build the React/Vite site and auto-deploy the `dist` folder
    * Creates a shell script called "manually-deploy.sh" that you can use to manually deploy your website to the S3 bucket
+4. React/Vite starter site:
+   * `npm run dev` starts the local development server
+   * `npm run build` writes production assets to `dist`
+   * GitHub Actions runs the build, syncs `dist` to S3, and invalidates CloudFront
+5. DNS delegation helper scripts:
+   * `./scripts/check-dns-delegation.sh` prints current registrar, current public nameservers, and expected Route53 nameservers
+   * `./scripts/check-dns-delegation.sh --wait` polls until public DNS points at Route53
+   * `./apply.sh` refuses to run `terraform apply` until nameserver delegation is correct
 
 
 
@@ -71,6 +83,7 @@ Many companies offer all of these parts - or some combination of parts (squaresp
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) must be installed and configured with **FullAccess** (configure it by typing `aws configure sso`, more information can be found [here](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html#getting-started-quickstart-new-command)).
 * [jq](https://jqlang.github.io/jq/) must be installed. This is a command-line JSON processor used by the shell scripts.
 * [gh](https://cli.github.com) Github CLI must be installed (and logged in) to create a new private repo and set up GitHub actions.
+* [Node.js](https://nodejs.org/) 20+ must be installed if you want to run or build the included React/Vite starter locally.
 
 
 ### Usage
@@ -83,15 +96,37 @@ git clone https://github.com/klinquist/tf-aws-s3-cf-template.git .
 ```
 2. Change the variables in the **terraform.tfvars** file.
 3. Run `./create-hosted-zone.sh` to automatically create the hosted zone in AWS Route53.
-4. Login to your domain registrar and update the NS records for your domain to the ones printed by the script above.  **Wait up to 10 minutes for the changes to propagate.**
+4. Login to your domain registrar and update the NS records for your domain to the ones printed by the script above. The script will try to detect your registrar and print a direct link/instructions for common providers.
   
-**If your domain's NS records are not pointed to AWS before running terraform, this script will timeout validating the certificate.**
+**If your domain's NS records are not pointed to AWS before running terraform, certificate validation will timeout.**
+
+You can check the current status at any time:
+
+```bash
+./scripts/check-dns-delegation.sh
+```
+
+Or wait until public DNS points to the Route53 nameservers:
+
+```bash
+./scripts/check-dns-delegation.sh --wait
+```
+
+The checker shows output like:
+
+```text
+Status: registrar still points to:
+  - dns1.registrar-example.com
+Waiting for Route53 nameservers:
+  - ns-123.awsdns-45.com
+```
 
 5. Run the following to deploy the infrastructure:
 ```
-terraform init
-terraform apply --auto-approve
+./apply.sh --auto-approve
 ```
+
+`./apply.sh` runs the DNS delegation check first and refuses to continue until the domain is delegated to Route53. It also runs `terraform init` for you if needed.
 
 6. Run `./set-up-repo.sh` to create a new private repository on GitHub, set up GitHub actions, and add AWS credentials to your GitHub repo secrets.   This will make a sample site available on https://www.domainname.com!  
 
@@ -101,9 +136,22 @@ Note: This creates resources in `us-east-1`.  If you want to change the default 
 
 ### Editing your web page
 
-Commit changes to the "_site" folder and push to GitHub.  The GitHub action will automatically deploy your changes to the S3 bucket and invalidate the CloudFront cache.  Your changes should be live in a few minutes.
+This repo now includes a React/Vite starter. Run it locally with:
 
-I personally use [Jekyll](https://jekyllrb.com/) to generate my website. It is a static site generator that uses markdown and templates to generate HTML.  The github action (in `.github/workflows/deploy.yml`) has lines commented out ready to build a Jekyll site if you go that route.
+```bash
+npm install
+npm run dev
+```
+
+Build the production site with:
+
+```bash
+npm run build
+```
+
+Commit your React app changes and push to GitHub. The GitHub action will run `npm ci`, build the site into `dist`, deploy `dist` to the S3 bucket, and invalidate the CloudFront cache. Your changes should be live in a few minutes.
+
+If you prefer another generator such as Jekyll, Hugo, or Astro, update `.github/workflows/deploy.yml` and `manually-deploy.sh` so they build your site and sync the generated output folder to S3.
 
 ### Undoing everything!
 
