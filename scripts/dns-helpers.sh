@@ -30,6 +30,45 @@ get_domain_name_from_tfvars() {
     echo "$domain_name"
 }
 
+update_domain_name_in_tfvars() {
+    local domain_name="$1"
+    local file_path="${2:-terraform.tfvars}"
+    local temp_file
+
+    if [ ! -f "$file_path" ]; then
+        echo "File not found: $file_path" >&2
+        return 1
+    fi
+
+    temp_file=$(mktemp "${file_path}.tmp.XXXXXX")
+    awk -v domain="$domain_name" '
+        /^[[:space:]]*domainName[[:space:]]*=/ {
+            print "domainName = \"" domain "\""
+            found_domain = 1
+            next
+        }
+        /^[[:space:]]*SiteTags[[:space:]]*=/ && /YourDomainHere\.com/ {
+            print "SiteTags = \"" domain "\""
+            next
+        }
+        { print }
+        END {
+            if (!found_domain) {
+                exit 2
+            }
+        }
+    ' "$file_path" > "$temp_file" || {
+        local status=$?
+        rm -f "$temp_file"
+        if [ "$status" -eq 2 ]; then
+            echo "domainName not found in $file_path." >&2
+        fi
+        return "$status"
+    }
+
+    mv "$temp_file" "$file_path"
+}
+
 normalize_nameservers() {
     tr '[:upper:]' '[:lower:]' \
         | sed 's/\.$//' \

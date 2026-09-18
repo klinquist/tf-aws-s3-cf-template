@@ -85,6 +85,35 @@ Many companies offer all of these parts - or some combination of parts (squaresp
 * [gh](https://cli.github.com) Github CLI must be installed (and logged in) to create a new private repo and set up GitHub actions.
 * [Node.js](https://nodejs.org/) 20+ must be installed if you want to run or build the included React/Vite starter locally.
 
+#### Optional: register the domain through Namecheap
+
+`./register-namecheap-domain.sh` can buy an available domain, create its Route53 hosted zone, give Namecheap the Route53 nameservers during registration, and update `terraform.tfvars` automatically. It uses Namecheap's API rather than storing registrar credentials in Terraform state.
+
+Before using it:
+
+* Enable API access under **Namecheap Profile > Tools > Business & Dev Tools**.
+* Whitelist the public IPv4 address of the computer running the script. Namecheap accepts IPv4 addresses only.
+* Make sure the Namecheap account is eligible for production API access (currently: at least 20 domains, a $50 account balance, or $50 spent in the last two years) and has enough balance for the purchase.
+* Have `curl` and Python 3 installed in addition to the prerequisites above.
+
+Run:
+
+```bash
+./register-namecheap-domain.sh example.com
+```
+
+The script securely prompts for a Namecheap API key and the required registration contact fields. The same values may be supplied as environment variables for automation; run `./register-namecheap-domain.sh --help` for their names. It checks availability and shows the quoted price before asking you to type the full domain name to authorize the purchase. The `--yes` flag skips that confirmation and should be used with care.
+
+If your Namecheap account does not have API access, use the browser-assisted flow instead:
+
+```bash
+./register-namecheap-domain.sh --browser example.com
+```
+
+This creates the Route53 hosted zone, opens Namecheap's registration page so you can sign in and pay, copies the Route53 nameservers to the clipboard on macOS, opens the purchased domain's control panel, updates `terraform.tfvars`, and checks delegation after you save the nameservers. Namecheap does not offer an OAuth-style browser authorization for its legacy API, so the purchase and Custom DNS form remain user-confirmed in this mode.
+
+Namecheap also provides a separate sandbox account and API endpoint for testing. You can point the script at it with `NAMECHEAP_API_URL=https://api.sandbox.namecheap.com/xml.response`, but sandbox registrations are simulated and will not delegate a real public domain.
+
 
 ### Usage
 
@@ -94,9 +123,9 @@ mkdir <domainname.com>
 cd <domainname.com>
 git clone https://github.com/klinquist/tf-aws-s3-cf-template.git .
 ```
-2. Change the variables in the **terraform.tfvars** file.
-3. Run `./create-hosted-zone.sh` to automatically create the hosted zone in AWS Route53.
-4. Login to your domain registrar and update the NS records for your domain to the ones printed by the script above. The script will try to detect your registrar and print a direct link/instructions for common providers.
+2. Either change the variables in **terraform.tfvars**, or run `./register-namecheap-domain.sh <domain>` to register a new Namecheap domain and update the file automatically.
+3. If you did not use the Namecheap registration script, run `./create-hosted-zone.sh` to automatically create the hosted zone in AWS Route53.
+4. If you did not use the Namecheap registration script, log in to your domain registrar and update the NS records for your domain to the ones printed by the script above. The script will try to detect your registrar and print a direct link/instructions for common providers. Namecheap registrations made by `register-namecheap-domain.sh` receive the Route53 nameservers automatically.
   
 **If your domain's NS records are not pointed to AWS before running terraform, certificate validation will timeout.**
 
