@@ -1,4 +1,8 @@
-Regularly register a domain and want to put some web content there?  This is a collection of tools you can use to quickly set up a website hosted by Amazon Web Services.    This is a very inexpensive hosting option, costing as little as 50 cents per month.
+# AWS Static Website Terraform Template
+
+**[Jump straight to Usage](#usage)**
+
+Regularly register a domain and want to put some web content there? This project quickly sets up a website hosted by Amazon Web Services. This is a very inexpensive hosting option, costing as little as 50 cents per month.
 
 ### What does hosting a website entail?
 
@@ -43,13 +47,15 @@ Many companies offer all of these parts - or some combination of parts (squaresp
 
 ### What does this repo include?
 
-1. `./create-hosted-zone.sh`: A shell script that:
-   * Adds a hosted zone in Route53 for your domain
-   * Prints the NS records for your domain so you can update your registrar
-   * Detects the current registrar through RDAP/whois when possible
-   * Prints registrar-specific nameserver instructions and useful links for common registrars
-   * Can wait and poll public DNS until the registrar delegates the domain to Route53
-2. Terraform module that does the following:
+1. `./setup.sh`: one guided setup command that:
+   * Asks which domain you want to use
+   * Asks whether you use Namecheap and whether the domain is already registered
+   * Opens Namecheap when registration or nameserver changes are needed
+   * Creates or reuses the Route53 hosted zone and updates `terraform.tfvars`
+   * Waits for public DNS delegation before continuing
+   * Runs `terraform init` and `terraform apply -auto-approve`
+   * Starts the GitHub repository and deployment setup
+2. Terraform modules that do the following:
    * Creates an S3 bucket (domainname) and static site hosting with `index.html` as the index document.
    * Creates a second S3 bucket for logs (domainname-logs) with a lifecycle policy to delete logs after 15 days
    * Creates a CloudFront distribution
@@ -57,7 +63,7 @@ Many companies offer all of these parts - or some combination of parts (squaresp
    * Creates a Route53 record for the domain name (adding www. as a CNAME)
    * Creates an IAM user & policy for a GitHub action.  Warning: Check the permissions, they are too liberal right now :).
    * (optional) Creates Route53 MX records and TXT validation record for Google Workspace
-3. `./set-up-repo.sh`: A shell script that:
+3. GitHub repository setup, run automatically by `./setup.sh`, that:
    * Creates a new private GitHub repo (called domainname.com) in your GitHub account
    * Commits all files in the current directory to the repo
    * Adds AWS credentials to your GitHub repo secrets so you can use the GitHub action to deploy your website to the S3 bucket
@@ -67,17 +73,13 @@ Many companies offer all of these parts - or some combination of parts (squaresp
    * `npm run dev` starts the local development server
    * `npm run build` writes production assets to `dist`
    * GitHub Actions runs the build, syncs `dist` to S3, and invalidates CloudFront
-5. DNS delegation helper scripts:
-   * `./scripts/check-dns-delegation.sh` prints current registrar, current public nameservers, and expected Route53 nameservers
-   * `./scripts/check-dns-delegation.sh --wait` polls until public DNS points at Route53
-   * `./apply.sh` refuses to run `terraform apply` until nameserver delegation is correct
 
 
 
 ### Prerequisites
 
 * A GitHub account
-* A domain registered with your favorite registrar.  I use namecheap.com.
+* A domain name you want to use. It may already be registered, or the setup will guide you through registering it. Namecheap has the most guided flow, but other registrars work too.
 * [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) must be installed.
 * An account with AWS.  You can sign up for an account [here](https://portal.aws.amazon.com/billing/signup).
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) must be installed and configured with **FullAccess** (configure it by typing `aws configure sso`, more information can be found [here](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html#getting-started-quickstart-new-command)).
@@ -85,79 +87,34 @@ Many companies offer all of these parts - or some combination of parts (squaresp
 * [gh](https://cli.github.com) Github CLI must be installed (and logged in) to create a new private repo and set up GitHub actions.
 * [Node.js](https://nodejs.org/) 20+ must be installed if you want to run or build the included React/Vite starter locally.
 
-#### Optional: register the domain through Namecheap
+## Usage
 
-`./register-namecheap-domain.sh` can buy an available domain, create its Route53 hosted zone, give Namecheap the Route53 nameservers during registration, and update `terraform.tfvars` automatically. It uses Namecheap's API rather than storing registrar credentials in Terraform state.
+1. Clone this repo. I recommend cloning it into a directory named after your domain name:
 
-Before using it:
-
-* Enable API access under **Namecheap Profile > Tools > Business & Dev Tools**.
-* Whitelist the public IPv4 address of the computer running the script. Namecheap accepts IPv4 addresses only.
-* Make sure the Namecheap account is eligible for production API access (currently: at least 20 domains, a $50 account balance, or $50 spent in the last two years) and has enough balance for the purchase.
-* Have `curl` and Python 3 installed in addition to the prerequisites above.
-
-Run:
-
-```bash
-./register-namecheap-domain.sh example.com
-```
-
-The script securely prompts for a Namecheap API key and the required registration contact fields. The same values may be supplied as environment variables for automation; run `./register-namecheap-domain.sh --help` for their names. It checks availability and shows the quoted price before asking you to type the full domain name to authorize the purchase. The `--yes` flag skips that confirmation and should be used with care.
-
-If your Namecheap account does not have API access, use the browser-assisted flow instead:
-
-```bash
-./register-namecheap-domain.sh --browser example.com
-```
-
-This creates the Route53 hosted zone, opens Namecheap's registration page so you can sign in and pay, copies the Route53 nameservers to the clipboard on macOS, opens the purchased domain's control panel, updates `terraform.tfvars`, and checks delegation after you save the nameservers. Namecheap does not offer an OAuth-style browser authorization for its legacy API, so the purchase and Custom DNS form remain user-confirmed in this mode.
-
-Namecheap also provides a separate sandbox account and API endpoint for testing. You can point the script at it with `NAMECHEAP_API_URL=https://api.sandbox.namecheap.com/xml.response`, but sandbox registrations are simulated and will not delegate a real public domain.
-
-
-### Usage
-
-1. Clone this repo! I recommend cloning it into a directory named after your domain name.  e.g. 
 ```bash
 mkdir <domainname.com>
 cd <domainname.com>
 git clone https://github.com/klinquist/tf-aws-s3-cf-template.git .
 ```
-2. Either change the variables in **terraform.tfvars**, or run `./register-namecheap-domain.sh <domain>` to register a new Namecheap domain and update the file automatically.
-3. If you did not use the Namecheap registration script, run `./create-hosted-zone.sh` to automatically create the hosted zone in AWS Route53.
-4. If you did not use the Namecheap registration script, log in to your domain registrar and update the NS records for your domain to the ones printed by the script above. The script will try to detect your registrar and print a direct link/instructions for common providers. Namecheap registrations made by `register-namecheap-domain.sh` receive the Route53 nameservers automatically.
-  
-**If your domain's NS records are not pointed to AWS before running terraform, certificate validation will timeout.**
 
-You can check the current status at any time:
+2. Run the guided setup:
 
 ```bash
-./scripts/check-dns-delegation.sh
+./setup.sh
 ```
 
-Or wait until public DNS points to the Route53 nameservers:
+That is the only setup command. It will:
 
-```bash
-./scripts/check-dns-delegation.sh --wait
-```
+1. Ask for your domain.
+2. Ask whether the registrar is Namecheap.
+3. Ask whether the domain is already registered. If not, it pauses while you register it in your browser.
+4. Create the Route53 hosted zone and show the four authoritative nameservers.
+5. Open the Namecheap domain manager when applicable, or explain where to change nameservers at another registrar.
+6. Wait until the public internet sees the Route53 nameservers.
+7. Initialize and apply Terraform automatically.
+8. Offer to create the private GitHub repository and configure deployment.
 
-The checker shows output like:
-
-```text
-Status: registrar still points to:
-  - dns1.registrar-example.com
-Waiting for Route53 nameservers:
-  - ns-123.awsdns-45.com
-```
-
-5. Run the following to deploy the infrastructure:
-```
-./apply.sh --auto-approve
-```
-
-`./apply.sh` runs the DNS delegation check first and refuses to continue until the domain is delegated to Route53. It also runs `terraform init` for you if needed.
-
-6. Run `./set-up-repo.sh` to create a new private repository on GitHub, set up GitHub actions, and add AWS credentials to your GitHub repo secrets.   This will make a sample site available on https://www.domainname.com!  
+The script will not run Terraform until DNS delegation is correct, because ACM certificate validation would otherwise time out.
 
 
 Note: This creates resources in `us-east-1`.  If you want to change the default region, you can do so by editing `main.tf`.
